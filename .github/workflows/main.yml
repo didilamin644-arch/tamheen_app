@@ -1,5 +1,10 @@
 name: Build APK
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - master
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,7 +14,8 @@ jobs:
         with:
           channel: 'stable'
       - run: flutter build apk --release
-      - uses: actions/upload-artifact@v3
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
         with:
-          name: my-app
+          name: app-release
           path: build/app/outputs/flutter-apk/app-release.apk
