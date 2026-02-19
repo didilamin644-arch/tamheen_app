@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build APK
 on: [push]
 jobs:
   build:
@@ -11,5 +11,5 @@ jobs:
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v3
         with:
-          name: app-release
+          name: my-app
           path: build/app/outputs/flutter-apk/app-release.apk
