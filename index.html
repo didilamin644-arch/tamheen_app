@@ -12,10 +12,11 @@
         #chat-section { display: none; flex-direction: column; height: 85vh; width: 95%; max-width: 500px; }
         #messages { flex-grow: 1; overflow-y: auto; text-align: right; padding: 10px; border: 1px solid #333; margin-bottom: 10px; border-radius: 8px; height: 350px; background: #181818; }
         .user-msg { color: #00e5bc; margin-bottom: 12px; border-right: 3px solid #00e5bc; padding-right: 10px; font-weight: bold; }
-        .ai-msg { color: #ffffff; margin-bottom: 12px; background: #2a2a2a; padding: 12px; border-radius: 10px; text-align: right; line-height: 1.6; }
+        .ai-msg { color: #ffffff; margin-bottom: 12px; background: #2a2a2a; padding: 12px; border-radius: 10px; text-align: right; line-height: 1.6; white-space: pre-wrap; }
     </style>
 </head>
 <body>
+    <!-- قسم تسجيل الدخول -->
     <div id="login-section" class="container">
         <h2 style="color: #bc9aff;">مرحباً بك في تمهين</h2>
         <input type="text" id="username" placeholder="اسم المستخدم">
@@ -24,34 +25,43 @@
         <p id="login-msg" style="color: #00e5bc; font-size: 0.9em; margin-top: 15px;"></p>
     </div>
 
+    <!-- قسم الشات -->
     <div id="chat-section" class="container">
         <h3 style="color: #00e5bc;">🤖 تمهين AI</h3>
         <div id="messages"></div>
         <div style="display: flex; gap: 5px;">
-            <input type="text" id="user-input" placeholder="اسأل تمهين أي شيء...">
+            <input type="text" id="user-input" placeholder="اسأل تمهين أي شيء..." onkeypress="if(event.key === 'Enter') sendMessage()">
             <button onclick="sendMessage()" style="width: 80px;">إرسال</button>
         </div>
     </div>
 
     <script>
+        // وظيفة تسجيل الدخول
         function login() {
             const user = document.getElementById('username').value;
             if(user) {
-                document.getElementById('login-msg').innerText = "أهلاً بك يا " + user + "!";
+                document.getElementById('login-msg').innerText = "جاري التحميل يا " + user + "...";
                 setTimeout(() => {
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('chat-section').style.display = 'flex';
                 }, 1000);
+            } else {
+                alert("يرجى إدخال اسم المستخدم");
             }
         }
 
+        // وظيفة إرسال الرسالة والاتصال بالذكاء الاصطناعي
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const messages = document.getElementById('messages');
             const userText = input.value.trim();
+
             if(userText !== "") {
+                // 1. إظهار رسالة المستخدم
                 messages.innerHTML += `<div class="user-msg">أنت: ${userText}</div>`;
                 input.value = "";
+                
+                // 2. إظهار رسالة انتظار للـ AI
                 const aiDiv = document.createElement("div");
                 aiDiv.className = "ai-msg";
                 aiDiv.innerHTML = "<b>تمهين:</b> جاري التفكير... 🧠";
@@ -59,6 +69,7 @@
                 messages.scrollTop = messages.scrollHeight;
 
                 try {
+                    // 3. الاتصال بـ OpenRouter
                     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                         method: "POST",
                         headers: {
@@ -70,11 +81,21 @@
                             "messages": [{"role": "user", "content": userText}]
                         })
                     });
+
                     const data = await response.json();
-                    aiDiv.innerHTML = `<b>تمهين:</b> ${data.choices[0].message.content}`;
+
+                    // 4. عرض الرد
+                    if (data.choices && data.choices[0]) {
+                        aiDiv.innerHTML = "<b>تمهين:</b> " + data.choices[0].message.content;
+                    } else {
+                        aiDiv.innerHTML = "<b>تمهين:</b> عذراً، حدث خطأ في معالجة الرد.";
+                    }
                 } catch (error) {
-                    aiDiv.innerHTML = "<b>تمهين:</b> عذراً، حدث خطأ في الاتصال.";
+                    aiDiv.innerHTML = "<b>تمهين:</b> خطأ في الاتصال، تأكد من مفتاح الـ API أو الإنترنت.";
+                    console.error("Error:", error);
                 }
+                
+                // التمرير لأسفل المحادثة
                 messages.scrollTop = messages.scrollHeight;
             }
         }
