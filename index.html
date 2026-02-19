@@ -3,34 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق تمهين</title>
+    <title>تمهين AI</title>
     <style>
         body { font-family: sans-serif; background-color: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: #1e1e1e; padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); width: 80%; text-align: center; }
-        h1 { color: #bb86fc; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { width: 100%; padding: 12px; background-color: #03dac6; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .container { background: #1e1e1e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 90%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #252525; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #00e5bc; color: #121212; font-weight: bold; cursor: pointer; }
+        #chat-section { display: none; flex-direction: column; height: 80vh; }
+        #messages { flex-grow: 1; overflow-y: auto; text-align: right; padding: 10px; border: 1px solid #333; margin-bottom: 10px; border-radius: 8px; }
+        .user-msg { color: #00e5bc; margin-bottom: 8px; }
+        .ai-msg { color: #b3b3b3; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 5px; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <h1>مرحباً بك في تمهين</h1>
+
+    <div id="login-section" class="container">
+        <h2 style="color: #bc9aff;">مرحباً بك في تمهين</h2>
         <input type="text" id="username" placeholder="اسم المستخدم">
-        <input type="password" id="password" placeholder="كلمة المرور">
+        <input type="password" id="password" placeholder="كلمة السر">
         <button onclick="login()">دخول</button>
-        <p id="msg"></p>
+        <p id="login-msg" style="color: #00e5bc; font-size: 0.9em; margin-top: 15px;"></p>
+    </div>
+
+    <div id="chat-section" class="container">
+        <h3 style="color: #00e5bc;">تمهين AI 🤖</h3>
+        <div id="messages"></div>
+        <input type="text" id="user-input" placeholder="اسأل أي شيء...">
+        <button onclick="sendMessage()">إرسال</button>
     </div>
 
     <script>
         function login() {
             const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            if(pass === "1234") {
-                document.getElementById('msg').innerText = "أهلاً بك يا " + user + "! جاري الدخول...";
-                document.getElementById('msg').style.color = "#03dac6";
-            } else {
-                document.getElementById('msg').innerText = "خطأ في كلمة المرور!";
-                document.getElementById('msg').style.color = "red";
+            if(user) {
+                document.getElementById('login-msg').innerText = "أهلاً بك يا " + user + "! جاري التحميل...";
+                setTimeout(() => {
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('chat-section').style.display = 'flex';
+                }, 1500);
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const messages = document.getElementById('messages');
+            if(input.value.trim() !== "") {
+                messages.innerHTML += `<div class="user-msg"><b>أنت:</b> ${input.value}</div>`;
+                // رد تجريبي سريع حتى نربط الـ API
+                setTimeout(() => {
+                    messages.innerHTML += `<div class="ai-msg"><b>تمهين:</b> أنا أسمعك جيداً! جاري ربط عقلي الاصطناعي للرد عليك بشكل كامل.</div>`;
+                    messages.scrollTop = messages.scrollHeight;
+                }, 1000);
+                input.value = "";
             }
         }
     </script>
